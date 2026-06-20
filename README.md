@@ -9,7 +9,6 @@ This monorepo is managed with Turborepo and includes the following apps and pack
 ### Applications
 
 *   **`apps/excelidraw-frontend`**: Next.js client application featuring a premium drawing canvas interface with multiplayer synchronization, visual editing tools, and user authentication.
-*   **`apps/web`**: Next.js main web page.
 *   **`apps/http-backend`**: Express REST API backend handling user sign-up, sign-in, room creation, and database queries.
 *   **`apps/ws-backend`**: WebSocket server handling low-latency room events, active user status updates, and real-time brush coordinates synchronization.
 
