@@ -150,6 +150,7 @@ console.log("HTTP Backend Started");
 
 
 
-app.listen(3002, () => {
-  console.log("Server running on port 3002");
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3002;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
