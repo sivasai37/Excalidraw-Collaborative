@@ -1,10 +1,8 @@
 
 import { useEffect, useRef, useState } from "react";
-import {IconButton} from "./ButtonIcon"
-import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
-import { Game } from "@/draw/Game";
-
-export type Tool = "circle" | "rect" | "pencil";
+import { IconButton } from "./ButtonIcon";
+import { Circle, Pencil, RectangleHorizontalIcon, Type } from "lucide-react";
+import { Game, type Tool } from "@/draw/Game";
 
 export function Canvas({
     roomId,
@@ -33,7 +31,7 @@ export function Canvas({
         }
 
 
-    }, [canvasRef]);
+    }, [canvasRef, roomId, socket]);
 
     return <div style={{
         height: "100vh",
@@ -61,13 +59,17 @@ function Topbar({selectedTool, setSelectedTool}: {
                     }}
                     activated={selectedTool === "pencil"}
                     icon={<Pencil />}
+                    title="Pencil"
                 />
                 <IconButton onClick={() => {
                     setSelectedTool("rect")
-                }} activated={selectedTool === "rect"} icon={<RectangleHorizontalIcon />} ></IconButton>
+                }} activated={selectedTool === "rect"} icon={<RectangleHorizontalIcon />} title="Rectangle"></IconButton>
                 <IconButton onClick={() => {
                     setSelectedTool("circle")
-                }} activated={selectedTool === "circle"} icon={<Circle />}></IconButton>
+                }} activated={selectedTool === "circle"} icon={<Circle />} title="Circle"></IconButton>
+                <IconButton onClick={() => {
+                    setSelectedTool("text")
+                }} activated={selectedTool === "text"} icon={<Type />} title="Text"></IconButton>
             </div>
         </div>
 }

@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthPage from "@/components/AuthPage";
 
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3002';
+
 const SignUp = () => {
   const router = useRouter();
-  const [form, setForm] = useState({ username: "", name: "", password: "" });
+  const [form, setForm] = useState({ email: "", name: "", password: "" });
   const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +20,7 @@ const SignUp = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3002/signup", {
+      const res = await fetch(`${BACKEND}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -32,7 +34,7 @@ const SignUp = () => {
       }
 
       router.push("/signin");
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
     }
   };
@@ -42,10 +44,10 @@ const SignUp = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          name="username"
+          name="email"
           placeholder="Email"
           className="w-full p-2 border rounded"
-          value={form.username}
+          value={form.email}
           onChange={handleChange}
           required
           suppressHydrationWarning

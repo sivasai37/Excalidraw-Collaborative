@@ -1,3 +1,9 @@
+// Environment variables declared in this file are automatically made available to Prisma.
+// See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+// Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+// See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,29 +14,59 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(uuid())
-  email         String     @unique
+  id            String         @id @default(uuid())
+  email         String         @unique
   password      String
   name          String
   photo         String?
-  rooms         Room[]
+  adminRooms    Room[]         @relation("adminUser")
   chats         Chat[]
+  pencilStrokes PencilStroke[]
+  textItems     TextItem[]
 }
 
 model Room {
-  id          Int       @id @default(autoincrement())
-  slug        String    @unique
-  createdAt   DateTime  @default(now())
-  adminId     String
-  admin       User      @relation(fields: [adminId], references: [id])
-  chats       Chat[]
+  id            Int            @id @default(autoincrement())
+  slug          String         @unique
+  createdAt     DateTime       @default(now())
+  adminId       String
+  admin         User           @relation("adminUser", fields: [adminId], references: [id])
+  chats         Chat[]
+  pencilStrokes PencilStroke[]
+  textItems     TextItem[]
 }
 
 model Chat {
-  id        Int       @id  @default(autoincrement())
+  id      Int    @id @default(autoincrement())
+  roomId  Int
+  message String
+  userId  String
+  room    Room   @relation(fields: [roomId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model PencilStroke {
+  id        Int      @id @default(autoincrement())
   roomId    Int
-  message   String
   userId    String
-  room      Room      @relation(fields: [roomId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+  pathData  Json
+  color     String   @default("#000000")
+  width     Int      @default(2)
+  createdAt DateTime @default(now())
+  room      Room     @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model TextItem {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  userId    String
+  text      String
+  x         Float
+  y         Float
+  color     String   @default("#000000")
+  fontSize  Int      @default(14)
+  createdAt DateTime @default(now())
+  room      Room     @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }

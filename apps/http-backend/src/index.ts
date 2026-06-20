@@ -2,6 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backendcommon/config";
 import { middleware } from "./middleware";
+import type { Request } from "express";
 import {
   CreateRoomSchema,
   CreateUserSchema,
@@ -31,24 +32,27 @@ app.post("/signup", async (req, res) => {
   try {
       const user = await prismaClient.user.create({
           data: {
-              email: parsedData.data?.username,
+              email: parsedData.data?.email,
               // TODO: Hash the pw
               password: parsedData.data.password,
               name: parsedData.data.name
           }
+
       })
+       console.log(user);
       res.json({
           userId: user.id
       })
   } catch(e) {
       res.status(411).json({
-          message: "User already exists with this username"
+          message: "User already exists with this email"
       })
   }
 })
 
 app.post("/signin", async (req, res) => {
   const parsedData = SigninSchema.safeParse(req.body);
+  console.log(parsedData);
   if (!parsedData.success) {
       res.json({
           message: "Incorrect inputs"
@@ -59,7 +63,7 @@ app.post("/signin", async (req, res) => {
   // TODO: Compare the hashed pws here
   const user = await prismaClient.user.findFirst({
       where: {
-          email: parsedData.data.username,
+          email: parsedData.data.email,
           password: parsedData.data.password
       }
   })
@@ -70,6 +74,7 @@ app.post("/signin", async (req, res) => {
       })
       return;
   }
+  console.log('User signed in', user);
 
   const token = jwt.sign({
       userId: user?.id
@@ -80,7 +85,7 @@ app.post("/signin", async (req, res) => {
   })
 })
 
-app.post("/room", middleware, async (req, res) => {
+app.post("/room", middleware, async (req: Request, res) => {
     const parsedData = CreateRoomSchema.safeParse(req.body);
     if (!parsedData.success) {
         res.json({
@@ -88,8 +93,13 @@ app.post("/room", middleware, async (req, res) => {
         });
         return;
     }
-    //@ts-ignore
-    const userId = req.userId; // Get the userId from the middleware
+    // middleware attaches `userId` to the request when authorized
+    // cast to any to access userId added by middleware
+    const userId = (req as any).userId as string | undefined;
+    if (!userId) {
+      res.status(403).json({ message: 'Unauthorized' });
+      return;
+    }
   
     try {
         const room = await prismaClient.room.create({
@@ -136,6 +146,10 @@ app.get("/chats/:roomId", async (req, res) => {
     
 })
 
+console.log("HTTP Backend Started");
 
 
-app.listen(3002);
+
+app.listen(3002, () => {
+  console.log("Server running on port 3002");
+});
